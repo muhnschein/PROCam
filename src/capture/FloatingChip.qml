@@ -21,12 +21,13 @@ MouseArea {
                             (label.visible ? label.implicitWidth : icon.width) + 2 * Theme.paddingMedium)
     opacity: enabled ? 1.0 : Theme.opacityLow
 
+    // Dark glass; a chip that is on is outlined and lettered in the accent.
     Rectangle {
         anchors.fill: parent
         radius: height / 2
-        color: chip.pressed ? Theme.rgba(Theme.highlightBackgroundColor, Theme.highlightBackgroundOpacity)
-                            : chip.checked ? Theme.rgba(Theme.highlightBackgroundColor, 0.6)
-                                           : Theme.rgba("black", 0.4)
+        color: chip.pressed ? CameraStyle.glassPressed : CameraStyle.glass
+        border.width: chip.checked ? CameraStyle.lineWidth : 0
+        border.color: CameraStyle.accent
     }
 
     Label {
@@ -36,9 +37,11 @@ MouseArea {
         visible: chip.text.length > 0
         text: chip.text
         font.family: CameraFonts.family
-        font.pixelSize: Theme.fontSizeSmall
-        font.bold: chip.checked
-        color: Theme.lightPrimaryColor
+        font.pixelSize: Theme.fontSizeExtraSmall
+        font.capitalization: Font.AllUppercase
+        font.letterSpacing: CameraStyle.capsSpacing
+        font.bold: true
+        color: chip.checked ? CameraStyle.accent : CameraStyle.primaryText
     }
 
     Icon {
@@ -49,7 +52,7 @@ MouseArea {
         width: Theme.iconSizeSmallPlus
         height: width
         source: chip.iconSource
-        color: Theme.lightPrimaryColor
+        color: chip.checked ? CameraStyle.accent : CameraStyle.primaryText
     }
 
     Row {

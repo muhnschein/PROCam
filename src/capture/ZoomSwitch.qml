@@ -37,7 +37,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: height / 2
-        color: Theme.rgba("black", 0.4)
+        color: CameraStyle.glass
     }
 
     Row {
@@ -59,9 +59,8 @@ Item {
                     anchors.fill: parent
                     anchors.margins: Theme.paddingSmall / 2
                     radius: height / 2
-                    color: parent.active ? Theme.rgba(Theme.highlightBackgroundColor, 0.6)
-                                         : parent.pressed ? Theme.rgba(Theme.highlightBackgroundColor, 0.3)
-                                                          : "transparent"
+                    color: parent.active ? CameraStyle.selectedFill
+                                         : parent.pressed ? CameraStyle.glassPressed : "transparent"
                 }
 
                 Label {
@@ -72,7 +71,7 @@ Item {
                     font.family: CameraFonts.family
                     font.pixelSize: parent.active ? Theme.fontSizeSmall : Theme.fontSizeExtraSmall
                     font.bold: parent.active
-                    color: Theme.lightPrimaryColor
+                    color: parent.active ? CameraStyle.accent : CameraStyle.primaryText
                 }
             }
         }

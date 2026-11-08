@@ -5,20 +5,32 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import com.procam.camera 1.0
 
-// PHOTO | VIDEO tabs above the shutter, as on Android cameras. Swiping the
-// viewfinder left/right switches them too.
+// NIGHT | PHOTO | VIDEO | PRO above the shutter, as on Android cameras.
+// NIGHT is listed only while night mode is offered (a dark scene). Swiping
+// the viewfinder left/right switches photo and video too.
 Row {
     id: root
 
-    property string mode: "image"
+    // "night", "photo", "video" or "pro".
+    property string mode: "photo"
+    property bool nightAvailable
     signal selected(string mode)
 
+    readonly property var _tabs: {
+        var tabs = []
+        if (nightAvailable) tabs.push({ "mode": "night", "label": "Night" })
+        tabs.push({ "mode": "photo", "label": "Photo" })
+        tabs.push({ "mode": "video", "label": "Video" })
+        tabs.push({ "mode": "pro", "label": "Pro" })
+        return tabs
+    }
+
     height: Theme.itemSizeExtraSmall
-    spacing: Theme.paddingLarge
+    spacing: Theme.paddingSmall
     opacity: enabled ? 1.0 : Theme.opacityLow
 
     Repeater {
-        model: [{ "mode": "image", "label": "Photo" }, { "mode": "video", "label": "Video" }]
+        model: root._tabs
 
         MouseArea {
             readonly property bool active: modelData.mode === root.mode
@@ -30,8 +42,8 @@ Row {
             Rectangle {
                 anchors.fill: parent
                 radius: height / 2
-                color: parent.active ? Theme.rgba("black", 0.45)
-                                     : parent.pressed ? Theme.rgba("black", 0.3) : "transparent"
+                color: CameraStyle.glass
+                opacity: parent.pressed ? 1.0 : 0.0
             }
 
             Label {
@@ -42,8 +54,25 @@ Row {
                 font.family: CameraFonts.family
                 font.pixelSize: Theme.fontSizeSmall
                 font.capitalization: Font.AllUppercase
-                font.bold: parent.active
-                color: parent.active ? "#ffd54a" : Theme.rgba(Theme.lightPrimaryColor, 0.8)
+                font.letterSpacing: CameraStyle.capsSpacing
+                font.bold: true
+                color: parent.active ? CameraStyle.accent : CameraStyle.secondaryText
+                style: Text.Outline
+                styleColor: "#20000000"
+            }
+
+            // The selected tab's mark under its label.
+            Rectangle {
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    top: tabLabel.bottom
+                    topMargin: Theme.paddingSmall / 2
+                }
+                width: Theme.paddingLarge + Theme.paddingSmall
+                height: CameraStyle.lineWidth
+                radius: height / 2
+                color: CameraStyle.accent
+                visible: parent.active
             }
         }
     }

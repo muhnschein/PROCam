@@ -404,6 +404,7 @@ SettingsOverlay {
         anchors.centerIn: parent
         size: BusyIndicatorSize.Large
         running: captureView.captureUiBlocked
+                 && !captureView.nightCaptureRunning
                  && camera.captureMode == Camera.CaptureStillImage
                  && !(captureView._camera2ViewfinderActive
                       && Settings.mode.camera2CaptureFormat === "jpeg")
@@ -423,7 +424,9 @@ SettingsOverlay {
         }
         height: timerLabel.height + Theme.paddingSmall
         radius: height / 2
-        color: Theme.rgba("black", 0.45)
+        color: CameraStyle.glass
+        border.width: CameraStyle.lineWidth
+        border.color: Theme.rgba(CameraStyle.record, 0.6)
         opacity: timerLabel.opacity
 
         Rectangle {
@@ -437,7 +440,7 @@ SettingsOverlay {
             width: Theme.paddingMedium
             height: width
             radius: width / 2
-            color: "#ff3b30"
+            color: CameraStyle.record
             SequentialAnimation on opacity {
                 running: captureView.recording
                 loops: Animation.Infinite
@@ -447,34 +450,130 @@ SettingsOverlay {
         }
     }
 
-    // Night mode exposes for a second or two: ask for a steady hand.
-    Rectangle {
+    // Night mode exposes for a second or two: ask for a steady hand. The
+    // ring fills over the burst's planned exposure time (frames x shutter);
+    // the bridge reports no single frames, so it is an estimate.
+    Item {
+        id: nightProgress
+
+        readonly property var plan: captureView.nightCaptureRunning ? captureView._camera2BurstPlan : null
+        readonly property real plannedMs: plan ? Math.max(1, Number(plan.frames))
+                                                 * Math.max(Number(plan.shutterNs) / 1e6, 33) : 1
+        property real progress
+
         anchors.centerIn: parent
-        width: holdStillRow.width + 2 * Theme.paddingLarge
-        height: holdStillRow.height + 2 * Theme.paddingMedium
-        radius: height / 2
-        color: Theme.rgba("black", 0.55)
+        width: Math.max(ring.width, nightText.width)
+        height: ring.height + Theme.paddingLarge + nightText.height
         opacity: captureView.nightCaptureRunning ? 1.0 : 0.0
         visible: opacity > 0.0
         Behavior on opacity { FadeAnimator {} }
 
-        Row {
-            id: holdStillRow
+        Timer {
+            interval: 50
+            repeat: true
+            triggeredOnStart: true
+            running: captureView.nightCaptureRunning
+            onTriggered: nightProgress.progress = Math.min(
+                             1, (Date.now() - captureView._camera2CaptureStartedMs) / nightProgress.plannedMs)
+        }
 
-            anchors.centerIn: parent
-            spacing: Theme.paddingMedium
+        Canvas {
+            id: ring
 
-            MoonIcon {
-                anchors.verticalCenter: parent.verticalCenter
-                lit: true
+            readonly property real lineWidth: Math.round(Theme.paddingSmall * 1.2)
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: Theme.itemSizeHuge * 1.4
+            height: width
+            onPaint: {
+                var ctx = getContext("2d")
+                var r = (width - lineWidth) / 2
+                ctx.reset()
+                ctx.lineWidth = lineWidth
+                ctx.lineCap = "round"
+                ctx.beginPath()
+                ctx.arc(width / 2, height / 2, r, 0, 2 * Math.PI)
+                ctx.fillStyle = Qt.rgba(0, 0, 0, 0.5)
+                ctx.fill()
+                ctx.strokeStyle = Qt.rgba(1, 1, 1, 0.15)
+                ctx.stroke()
+                if (nightProgress.progress > 0) {
+                    ctx.beginPath()
+                    ctx.arc(width / 2, height / 2, r, -Math.PI / 2,
+                            -Math.PI / 2 + 2 * Math.PI * nightProgress.progress)
+                    ctx.strokeStyle = CameraStyle.accent
+                    ctx.stroke()
+                }
+            }
+            Connections {
+                target: nightProgress
+                onProgressChanged: ring.requestPaint()
+            }
+
+            Column {
+                anchors.centerIn: parent
+                spacing: Theme.paddingSmall / 2
+
+                MoonIcon {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    lit: true
+                }
+
+                Label {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: nightProgress.plan ? nightProgress.plan.frames : ""
+                    font.family: CameraFonts.family
+                    font.pixelSize: Theme.fontSizeHuge
+                    font.bold: true
+                    color: CameraStyle.primaryText
+                }
+
+                Label {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Frames"
+                    font.family: CameraFonts.family
+                    font.pixelSize: Theme.fontSizeTiny
+                    font.capitalization: Font.AllUppercase
+                    font.letterSpacing: CameraStyle.capsSpacing
+                    font.bold: true
+                    color: CameraStyle.secondaryText
+                }
+            }
+        }
+
+        Column {
+            id: nightText
+
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                top: ring.bottom
+                topMargin: Theme.paddingLarge
+            }
+            spacing: Theme.paddingSmall
+
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Hold still"
+                font.family: CameraFonts.family
+                font.pixelSize: Theme.fontSizeLarge
+                font.bold: true
+                color: CameraStyle.primaryText
+                style: Text.Outline
+                styleColor: "#40000000"
             }
 
             Label {
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Hold still"
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: !!nightProgress.plan
+                text: nightProgress.plan
+                      ? "ISO " + nightProgress.plan.iso + " · "
+                        + Settings.rawCaptureShutterLabel(String(nightProgress.plan.shutterNs)) + " per frame"
+                      : ""
                 font.family: CameraFonts.family
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.lightPrimaryColor
+                font.pixelSize: Theme.fontSizeExtraSmall
+                color: CameraStyle.secondaryText
+                style: Text.Outline
+                styleColor: "#40000000"
             }
         }
     }
@@ -492,7 +591,8 @@ SettingsOverlay {
                                     _recordingDuration >= 3600 ? Formatter.DurationLong : Formatter.DurationShort)
         font.family: CameraFonts.family
         font.pixelSize: Theme.fontSizeLarge
-        color: Theme.lightPrimaryColor
+        font.bold: true
+        color: CameraStyle.primaryText
         style: Text.Outline
         styleColor: "#20000000"
     }
@@ -524,9 +624,9 @@ SettingsOverlay {
         }
         font.family: CameraFonts.family
         font.pixelSize: Theme.fontSizeExtraSmall
-        color: Theme.lightPrimaryColor
+        color: CameraStyle.accent
         style: Text.Outline
-        styleColor: "#20000000"
+        styleColor: "#40000000"
     }
 
     WallClock {

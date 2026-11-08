@@ -66,6 +66,24 @@ PinchArea {
         if (Settings.global.captureMode !== mode) Settings.global.captureMode = mode
     }
 
+    // The NIGHT | PHOTO | VIDEO | PRO tabs: Pro is the advanced mode, Night
+    // the night mode in Normal photo mode. Video keeps both as they were, so
+    // swiping back to photo returns to the same tab.
+    readonly property string captureTab: Settings.global.captureMode === "video" ? "video"
+                                       : Settings.global.advancedMode ? "pro"
+                                       : Settings.nightMode ? "night" : "photo"
+
+    function selectCaptureTab(tab) {
+        if (!captureView || captureView.captureBusy || captureView.recording) return
+        if (tab === "video") {
+            selectCaptureMode("video")
+            return
+        }
+        selectCaptureMode("image")
+        Settings.global.advancedMode = tab === "pro"
+        Settings.nightMode = tab === "night"
+    }
+
     function evChoices() {
         if (!exposureControl) return [0]
         if (exposureControl.partial) return [-4, -3, -2, -1, 0, 1, 2, 3, 4]
@@ -423,8 +441,11 @@ PinchArea {
         opacity: overlay.settingsOpacity < 0.5 ? 1.0 : 0.0
         Behavior on opacity { FadeAnimation {} }
         enabled: !!captureView && !captureView.captureBusy
-        mode: Settings.global.captureMode
-        onSelected: overlay.selectCaptureMode(mode)
+        mode: overlay.captureTab
+        // Offered while the scene is dark, as the moon chip was.
+        nightAvailable: floatingTopBar.burstAvailable && !!captureView
+                        && (captureView.sceneDark || Settings.nightMode)
+        onSelected: overlay.selectCaptureTab(mode)
     }
 
     // Photo-mode controls floating along the top edge of the viewfinder.
@@ -478,14 +499,6 @@ PinchArea {
                 onClicked: overlay.topMenuOpen = true
             }
 
-            // Normal hides the histogram and exposure readouts; Pro shows them all.
-            ModeSwitch {
-                height: parent.height
-                visible: !camera2BottomDeck.video
-                enabled: !captureView.captureBusy
-                pro: Settings.global.advancedMode
-                onSelected: Settings.global.advancedMode = pro
-            }
         }
 
         Row {
@@ -511,12 +524,13 @@ PinchArea {
                            modes[(modes.indexOf(Settings.global.camera2Flash) + 1) % modes.length]
             }
 
-            // Night mode: offered when the scene is too dark, on by a tap.
+            // Night mode in Pro, offered when the scene is too dark, on by a
+            // tap. Normal photo mode has the NIGHT tab instead.
             FloatingChip {
                 id: nightChip
 
                 height: parent.height
-                visible: floatingTopBar.burstAvailable && !camera2BottomDeck.video
+                visible: floatingTopBar.burstAvailable && camera2BottomDeck.pro
                          && (captureView.sceneDark || Settings.nightMode)
                 enabled: !captureView.captureBusy
                 checked: Settings.nightMode

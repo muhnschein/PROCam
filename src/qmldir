@@ -11,3 +11,4 @@ CameraPage 1.0 CameraPage.qml
 DisabledByMdmView 1.0 DisabledByMdmView.qml
 IsoItem 1.0 settings/IsoItem.qml
 singleton CameraFonts 1.0 fonts/CameraFonts.qml
+singleton CameraStyle 1.0 capture/CameraStyle.qml

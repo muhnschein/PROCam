@@ -164,7 +164,7 @@ Item {
                     anchors.fill: parent
                     radius: height / 2
                     color: "transparent"
-                    border.color: Theme.highlightColor
+                    border.color: CameraStyle.primaryText
                     border.width: Math.max(2, Math.round(Theme.pixelRatio * 2))
                     visible: parent.open
                 }
@@ -193,7 +193,7 @@ Item {
         Rectangle {
             anchors.fill: parent
             radius: Theme.paddingSmall
-            color: Theme.rgba("black", 0.4)
+            color: CameraStyle.glass
         }
 
         // Focus peaking next to the focus dial, zebras next to exposure.
@@ -233,7 +233,7 @@ Item {
             y: root.vertical ? aidToggle.height + (parent.height - aidToggle.height - height) / 2 : 0
             width: root.vertical ? Theme.paddingSmall : Math.max(2, Math.round(Theme.pixelRatio * 2))
             height: root.vertical ? Math.max(2, Math.round(Theme.pixelRatio * 2)) : Theme.paddingSmall
-            color: Theme.highlightColor
+            color: CameraStyle.accent
         }
     }
 
