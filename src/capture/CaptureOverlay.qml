@@ -390,6 +390,7 @@ SettingsOverlay {
             opacity: captureTimer.running ? captureView._captureCountdown % 1 : 1.0
             color: captureTimer.running ? Theme.lightPrimaryColor : Theme.darkPrimaryColor
             font {
+                family: CameraFonts.family
                 pixelSize: captureTimer.running ? Theme.fontSizeHuge : Theme.fontSizeTiny
                 weight: Font.Light
             }
@@ -471,6 +472,7 @@ SettingsOverlay {
             Label {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Hold still"
+                font.family: CameraFonts.family
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.lightPrimaryColor
             }
@@ -488,6 +490,7 @@ SettingsOverlay {
 
         text: Format.formatDuration(_recordingDuration,
                                     _recordingDuration >= 3600 ? Formatter.DurationLong : Formatter.DurationShort)
+        font.family: CameraFonts.family
         font.pixelSize: Theme.fontSizeLarge
         color: Theme.lightPrimaryColor
         style: Text.Outline
@@ -519,6 +522,7 @@ SettingsOverlay {
                 return Math.floor(_recSecsRemaining/60) + " min estimated recording time left"
             }
         }
+        font.family: CameraFonts.family
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.lightPrimaryColor
         style: Text.Outline
@@ -697,6 +701,7 @@ SettingsOverlay {
             }
             visible: brightnessDrag.pressed
             text: (captureView.tapExposureEv > 0 ? "+" : "") + captureView.tapExposureEv.toFixed(1)
+            font.family: CameraFonts.family
             font.pixelSize: Theme.fontSizeExtraSmall
             color: "#ffd54a"
         }

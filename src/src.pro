@@ -77,7 +77,16 @@ import.files = \
 import.path = $$TARGETPATH
 target.path = $$TARGETPATH
 
-INSTALLS += target import
+# D-DIN (OFL-1.1, see LICENSES/OFL-1.1.txt) for the camera UI text, loaded
+# by the CameraFonts singleton. Listed by name so the REUSE .license files
+# stay out of the package.
+fonts.files = \
+        fonts/CameraFonts.qml \
+        fonts/D-DIN.ttf \
+        fonts/D-DIN-Bold.ttf
+fonts.path = $$TARGETPATH/fonts
+
+INSTALLS += target import fonts
 
 OTHER_FILES = \
         DisabledByMdmView.qml \
@@ -88,4 +97,6 @@ OTHER_FILES = \
         settings/*.qml \
         settings/*.js \
         settings.qml \
+        fonts/*.qml \
+        fonts/*.ttf \
         qmldir

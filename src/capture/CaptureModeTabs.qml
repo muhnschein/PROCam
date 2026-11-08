@@ -3,6 +3,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import com.procam.camera 1.0
 
 // PHOTO | VIDEO tabs above the shutter, as on Android cameras. Swiping the
 // viewfinder left/right switches them too.
@@ -38,6 +39,7 @@ Row {
 
                 anchors.centerIn: parent
                 text: modelData.label
+                font.family: CameraFonts.family
                 font.pixelSize: Theme.fontSizeSmall
                 font.capitalization: Font.AllUppercase
                 font.bold: parent.active

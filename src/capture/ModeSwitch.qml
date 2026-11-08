@@ -3,6 +3,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import com.procam.camera 1.0
 
 // Segmented Normal | Pro switch floating over the viewfinder.
 Item {
@@ -50,6 +51,7 @@ Item {
 
                     anchors.centerIn: parent
                     text: modelData ? "Pro" : "Normal"
+                    font.family: CameraFonts.family
                     font.pixelSize: Theme.fontSizeSmall
                     font.bold: parent.active
                     color: Theme.lightPrimaryColor

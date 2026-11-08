@@ -8,7 +8,7 @@ Name:       procam
 Summary:    Computational photography camera for the Jolla Phone 2
 Version:    1.4.0
 Release:    1
-License:    BSD-3-Clause AND GPL-2.0-or-later AND GPL-3.0-or-later AND LGPL-3.0-or-later
+License:    BSD-3-Clause AND GPL-2.0-or-later AND GPL-3.0-or-later AND LGPL-3.0-or-later AND OFL-1.1
 URL:        https://github.com/IvanVojtko/PROCam
 Source0:    %{name}-%{version}.tar.bz2
 
@@ -101,6 +101,7 @@ systemctl-user try-restart localsearch-3.service || :
 %files
 %license LICENSES/BSD-3-Clause.txt
 %license licenses/RawBracket-MIT.txt
+%license LICENSES/OFL-1.1.txt
 %{_datadir}/applications/procam.desktop
 %{_datadir}/icons/hicolor/500x500/apps/procam-sfos.png
 %dir %{_datadir}/procam
@@ -115,6 +116,7 @@ systemctl-user try-restart localsearch-3.service || :
 %{_datadir}/jolla-settings/pages/procam/SettingsPage.qml
 %dir %{_datadir}/jolla-settings/entries
 %{_datadir}/jolla-settings/entries/procam.json
+# The QML module, with the D-DIN fonts (OFL-1.1) under fonts/.
 %{_libdir}/qt5/qml/com/procam/camera
 %dir %{_libexecdir}/procam
 %{_libexecdir}/procam/sfos-camera2-probe

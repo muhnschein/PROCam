@@ -5,6 +5,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import com.procam.camera 1.0
 
 Item {
     id: indicator
@@ -36,6 +37,7 @@ Item {
         }
 
         color: indicator.color
+        font.family: CameraFonts.family
         font.pixelSize: minimumLabel.font.pixelSize
         font.bold: minimumLabel.font.bold
         text: "Zoom"
@@ -80,6 +82,7 @@ Item {
         }
 
         color: indicator.color
+        font.family: CameraFonts.family
         font.pixelSize: Theme.fontSizeExtraSmall
         font.bold: true
         text: "min"
@@ -94,6 +97,7 @@ Item {
         }
 
         color: indicator.color
+        font.family: CameraFonts.family
         font.pixelSize: minimumLabel.font.pixelSize
         font.bold: minimumLabel.font.bold
         text: "max"

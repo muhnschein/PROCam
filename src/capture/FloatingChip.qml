@@ -3,6 +3,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import com.procam.camera 1.0
 
 // Small translucent button floating over the viewfinder: text, an icon, or
 // three dots (menu) when neither is set.
@@ -34,6 +35,7 @@ MouseArea {
         anchors.centerIn: parent
         visible: chip.text.length > 0
         text: chip.text
+        font.family: CameraFonts.family
         font.pixelSize: Theme.fontSizeSmall
         font.bold: chip.checked
         color: Theme.lightPrimaryColor

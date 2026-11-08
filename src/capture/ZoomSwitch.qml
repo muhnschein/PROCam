@@ -3,6 +3,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import com.procam.camera 1.0
 
 // Pixel-style zoom presets floating over the viewfinder. The active preset
 // shows the live zoom while pinching (e.g. "1.4×"); the others only their
@@ -68,6 +69,7 @@ Item {
 
                     anchors.centerIn: parent
                     text: root.label(modelData, parent.active)
+                    font.family: CameraFonts.family
                     font.pixelSize: parent.active ? Theme.fontSizeSmall : Theme.fontSizeExtraSmall
                     font.bold: parent.active
                     color: Theme.lightPrimaryColor
